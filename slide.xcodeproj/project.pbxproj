@@ -7,7 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F1B0C8429B6872300E89FB9 /* libjpeg.8.2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F1B0C8329B6872300E89FB9 /* libjpeg.8.2.2.dylib */; };
+		1F1B0C8629B6879000E89FB9 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F1B0C8529B6879000E89FB9 /* libglfw.3.3.dylib */; };
 		1F6E354A29B67EA300F46269 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F6E354929B67EA300F46269 /* main.cpp */; };
+		1F6E355229B67EBF00F46269 /* JPEGImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F6E355029B67EBF00F46269 /* JPEGImage.cpp */; };
+		1F6E355529B67F0D00F46269 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F6E355429B67F0D00F46269 /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,8 +27,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1F1B0C8329B6872300E89FB9 /* libjpeg.8.2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjpeg.8.2.2.dylib; path = "../../../../../opt/homebrew/Cellar/jpeg-turbo/2.1.4/lib/libjpeg.8.2.2.dylib"; sourceTree = "<group>"; };
+		1F1B0C8529B6879000E89FB9 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../opt/homebrew/Cellar/glfw/3.3.8/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
 		1F6E354629B67EA300F46269 /* slide */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = slide; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F6E354929B67EA300F46269 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		1F6E355029B67EBF00F46269 /* JPEGImage.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = JPEGImage.cpp; sourceTree = "<group>"; };
+		1F6E355129B67EBF00F46269 /* JPEGImage.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = JPEGImage.hpp; sourceTree = "<group>"; };
+		1F6E355429B67F0D00F46269 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +41,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F1B0C8629B6879000E89FB9 /* libglfw.3.3.dylib in Frameworks */,
+				1F1B0C8429B6872300E89FB9 /* libjpeg.8.2.2.dylib in Frameworks */,
+				1F6E355529B67F0D00F46269 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +55,7 @@
 			children = (
 				1F6E354829B67EA300F46269 /* slide */,
 				1F6E354729B67EA300F46269 /* Products */,
+				1F6E355329B67F0D00F46269 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,8 +71,20 @@
 			isa = PBXGroup;
 			children = (
 				1F6E354929B67EA300F46269 /* main.cpp */,
+				1F6E355029B67EBF00F46269 /* JPEGImage.cpp */,
+				1F6E355129B67EBF00F46269 /* JPEGImage.hpp */,
 			);
 			path = slide;
+			sourceTree = "<group>";
+		};
+		1F6E355329B67F0D00F46269 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1F1B0C8529B6879000E89FB9 /* libglfw.3.3.dylib */,
+				1F1B0C8329B6872300E89FB9 /* libjpeg.8.2.2.dylib */,
+				1F6E355429B67F0D00F46269 /* OpenGL.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -120,6 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F6E354A29B67EA300F46269 /* main.cpp in Sources */,
+				1F6E355229B67EBF00F46269 /* JPEGImage.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +193,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					GL_SILENCE_DEPRECATION,
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -176,11 +203,23 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/lib,
+					/usr/local/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					/usr/local/include,
+				);
 			};
 			name = Debug;
 		};
@@ -228,10 +267,22 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/lib,
+					/usr/local/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					/usr/local/include,
+				);
 			};
 			name = Release;
 		};
@@ -239,7 +290,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/opt/homebrew/Cellar/jpeg-turbo/2.1.4/lib",
+					/opt/homebrew/Cellar/glfw/3.3.8/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "";
 			};
 			name = Debug;
 		};
@@ -247,7 +305,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/opt/homebrew/Cellar/jpeg-turbo/2.1.4/lib",
+					/opt/homebrew/Cellar/glfw/3.3.8/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "";
 			};
 			name = Release;
 		};
