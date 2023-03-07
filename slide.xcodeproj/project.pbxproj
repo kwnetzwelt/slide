@@ -12,6 +12,7 @@
 		1F6E354A29B67EA300F46269 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F6E354929B67EA300F46269 /* main.cpp */; };
 		1F6E355229B67EBF00F46269 /* JPEGImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F6E355029B67EBF00F46269 /* JPEGImage.cpp */; };
 		1F6E355529B67F0D00F46269 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F6E355429B67F0D00F46269 /* OpenGL.framework */; };
+		1FD9EBF129B7AD4C00DF5598 /* Files.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FD9EBEF29B7AD4C00DF5598 /* Files.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +35,8 @@
 		1F6E355029B67EBF00F46269 /* JPEGImage.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = JPEGImage.cpp; sourceTree = "<group>"; };
 		1F6E355129B67EBF00F46269 /* JPEGImage.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = JPEGImage.hpp; sourceTree = "<group>"; };
 		1F6E355429B67F0D00F46269 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		1FD9EBEF29B7AD4C00DF5598 /* Files.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Files.cpp; sourceTree = "<group>"; };
+		1FD9EBF029B7AD4C00DF5598 /* Files.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Files.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +76,8 @@
 				1F6E354929B67EA300F46269 /* main.cpp */,
 				1F6E355029B67EBF00F46269 /* JPEGImage.cpp */,
 				1F6E355129B67EBF00F46269 /* JPEGImage.hpp */,
+				1FD9EBEF29B7AD4C00DF5598 /* Files.cpp */,
+				1FD9EBF029B7AD4C00DF5598 /* Files.hpp */,
 			);
 			path = slide;
 			sourceTree = "<group>";
@@ -145,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F6E354A29B67EA300F46269 /* main.cpp in Sources */,
+				1FD9EBF129B7AD4C00DF5598 /* Files.cpp in Sources */,
 				1F6E355229B67EBF00F46269 /* JPEGImage.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

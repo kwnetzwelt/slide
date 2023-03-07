@@ -8,8 +8,17 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include "JPEGImage.hpp"
+#include "Files.hpp"
 
 
+static Files* imageFiles;
+
+JPEGImage* GetNextImage()
+{
+    std::string fileName;
+    fileName = imageFiles->GetNextRandom();
+    return new JPEGImage(fileName.c_str());
+}
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -19,47 +28,86 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+void log(std::string text)
+{
+    std::cout << text << std::endl;
+}
+
+void PrintHelp()
+{
+    log("pass a directory as a first argument");
+    log("pass an integer time in seconds as a second argument (default is 5)");
+}
+
 double lerp(double start, double end, double fraction) {
     return start + fraction * (end - start);
 }
-
+GLuint InitTexture(JPEGImage* image)
+{
+    // Load image data into a texture
+    GLuint textureId;
+    
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    
+    // Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->data);
+    
+    return textureId;
+}
 
 int main(int argc, const char * argv[]) {
-    // Initialize GLFW library
-    glfwInit();
+    std::string basedir = "/Volumes/4tb/media/pictures/Photos/";
+    //std::string basedir;
+    int timePerImage = 15;
     
     const int width = 1920;
     const int height = 1080;
     
-    // initialize timer
-    auto startTime = std::chrono::high_resolution_clock::now();
-
-    
-    //std::string fileName = "/Users/kaiwegner/Downloads/1343.jpeg"; // for debugging only
-    std::string fileName = "/Users/kaiwegner/Downloads/21by9.jpeg"; // for debugging only
-    if(argc > 1)
-    {
-        fileName = std::string(argv[1]);
-    }
-    
-    
     double elapsed = 0;
     double zoom = 0;
-    double offset_x = 0;
-    double offset_y = 0;
+    
+    GLuint textureId;
+    GLFWwindow* window;
     
     
     float* correctedVertices = new float[8];
     float height_f = (float)height;
     float width_f = (float)width;
     
+    // parse commandline arguments
+    if(argc > 1)
+    {
+        basedir = std::string(argv[1]);
+        if(basedir == "-h" || basedir == "--help")
+            PrintHelp();
+    }
+    if(argc > 2)
+    {
+        timePerImage = std::atoi(argv[2]);
+    }
     
-    JPEGImage image(fileName.c_str());
+    
+    // Initialize GLFW library
+    glfwInit();
+    
+    
+    // collect files for display
+    log("looking for files...");
+    imageFiles = new Files(basedir.c_str());
+    
+    log(std::to_string(imageFiles->count) + " files found");
+    
 
 
     // Create a window with OpenGL context
-    //GLFWwindow* window = glfwCreateWindow(width, height, "OpenGL Window", glfwGetPrimaryMonitor(), NULL); // fullscreen
-    GLFWwindow* window = glfwCreateWindow(width, height, "OpenGL Window", NULL, NULL);
+    window = glfwCreateWindow(width, height, "OpenGL Window", glfwGetPrimaryMonitor(), NULL); // fullscreen
+    //window = glfwCreateWindow(width, height, "OpenGL Window", NULL, NULL);
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
 
@@ -73,9 +121,29 @@ int main(int argc, const char * argv[]) {
     glLoadIdentity();
 
     
+    JPEGImage* image = GetNextImage();
+    JPEGImage* next_image = GetNextImage();
+    
+    textureId = InitTexture(image);
+    
+    // initialize timer
+    auto startTime = std::chrono::high_resolution_clock::now();
+
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
         
+        
+        if(elapsed > timePerImage)
+        {
+            delete image;
+            image = next_image;
+            next_image = GetNextImage();
+            elapsed = 0;
+            
+            glDeleteTextures(1, &textureId);
+            textureId = InitTexture(image);
+            
+        }
         auto endTime = std::chrono::high_resolution_clock::now();
         auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
         double deltaTime = std::chrono::duration<double>(delta).count();
@@ -84,37 +152,15 @@ int main(int argc, const char * argv[]) {
         zoom = lerp(0, 1, elapsed * 10);
 
         // correct vertex positions for aspect ratio
-        correctedVertices[0] = -(height_f + zoom) * image.aspect; // bottom left x
+        correctedVertices[0] = -(height_f + zoom) * image->aspect; // bottom left x
         correctedVertices[1] = -(height_f + zoom); // bottom left y
-        correctedVertices[2] = (height_f + zoom) * image.aspect; // bottom right x
+        correctedVertices[2] = (height_f + zoom) * image->aspect; // bottom right x
         correctedVertices[3] = -(height_f + zoom); // bottom right y
-        correctedVertices[4] = (height_f + zoom) * image.aspect; // top right x
+        correctedVertices[4] = (height_f + zoom) * image->aspect; // top right x
         correctedVertices[5] = height_f + zoom; // top right y
-        correctedVertices[6] = -(height_f + zoom) * image.aspect; // top left x
+        correctedVertices[6] = -(height_f + zoom) * image->aspect; // top left x
         correctedVertices[7] = height_f + zoom; // top left y
         
-        
-        float uv_bottom_left_x = 0;
-        float uv_bottom_left_y = 0;
-        float uv_top_right_x = 1.0f;
-        float uv_top_right_y = 1.0f;
-        
-        // Rendering
-        //glOrtho(-width/zoom, width/zoom, -height/zoom, height/zoom, -1.0, 1.0);
-        //image.draw(deltaTime, width, height);
-
-        // Load image data into a texture
-        GLuint textureId;
-        glGenTextures(1, &textureId);
-        glBindTexture(GL_TEXTURE_2D, textureId);
-        
-        // Set texture parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data);
         
         // Enable texturing
         glEnable(GL_TEXTURE_2D);
@@ -141,29 +187,7 @@ int main(int argc, const char * argv[]) {
             glVertex2f(correctedVertices[6], correctedVertices[7]); // top left
         }
         
-        //fullscreen image
-        /*{
-            //bottom left part
-            glTexCoord2f(0.0f, 1.0f);
-            glVertex2f(-width, -height); // bottom left
-            glTexCoord2f(1.0f, 1.0f);
-            glVertex2f(width, -height); // bottom right
-            glTexCoord2f(1.0f, 0.0f);
-            glVertex2f(width, height); // top right
-        }
-        {
-            //top right part
-            glTexCoord2f(0.0f, 1.0f);
-            glVertex2f(-width, -height); // bottom left
-            glTexCoord2f(1.0f, 0.0f);
-            glVertex2f(width, height); // top right
-            glTexCoord2f(0.0f, 0.0f);
-            glVertex2f(-width, height); // top left
-        }
-        */
         glEnd();
-
-
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
