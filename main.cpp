@@ -68,21 +68,7 @@ int main(int argc, const char * argv[]) {
     std::string basedir;
     //std::string basedir;
     int timePerImage = 15;
-    
-    const int width = 1920;
-    const int height = 1080;
-    
-    double elapsed = 0;
-    double zoom = 0;
-    
-    GLuint textureId;
-    GLFWwindow* window;
-    
-    
-    float* correctedVertices = new float[8];
-    float height_f = (float)height;
-    float width_f = (float)width;
-    
+
     // parse commandline arguments
     if(argc > 1)
     {
@@ -99,13 +85,31 @@ int main(int argc, const char * argv[]) {
     // Initialize GLFW library
     glfwInit();
     
+    // we always want to display fullscreen
+    GLFWmonitor* primary = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(primary);
+
+    
+    int width = mode->width;
+    int height = mode->height;
+    
+    double elapsed = 0;
+    double zoom = 0;
+    
+    GLuint textureId;
+    GLFWwindow* window;
+
+    float* correctedVertices = new float[8];
+    float height_f = (float)height;
+    float width_f = (float)width;
+    
     
     // collect files for display
     log("looking for files...");
     imageFiles = new Files(basedir.c_str());
     
     
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
     // Create a window with OpenGL context
     window = glfwCreateWindow(width, height, "OpenGL Window", glfwGetPrimaryMonitor(), NULL); // fullscreen
