@@ -8,6 +8,7 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include "JPEGImage.hpp"
+#include <GL/gl.h>
 #include "Files.hpp"
 
 
@@ -62,7 +63,7 @@ GLuint InitTexture(JPEGImage* image)
 }
 
 int main(int argc, const char * argv[]) {
-    std::string basedir = "/Volumes/4tb/media/pictures/Photos/";
+    std::string basedir;
     //std::string basedir;
     int timePerImage = 15;
     
