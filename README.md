@@ -1,8 +1,11 @@
 # slide
 
+Shows a slideshow of pictures that reside in a given directory (recursively) in fullscreen using opengl. 
+
 ## dependencies
 
 `sudo pacman -S glfw-wayland` // or x11 respectively
+
 `sudo pacman -S mesa`
 
 ## how to build
