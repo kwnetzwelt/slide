@@ -13,7 +13,7 @@
 #include "Files.hpp"
 
 
-
+static bool f_pressed;
 static Files* imageFiles;
 
 JPEGImage* GetNextImage()
@@ -40,6 +40,8 @@ void PrintHelp()
 {
     log("pass a directory as a first argument");
     log("pass an integer time in seconds as a second argument (default is 5)");
+    log("you can press <f> to toggle fullscreen");
+    log("you can press <q> to quit");
 }
 
 double lerp(double start, double end, double fraction) {
@@ -63,6 +65,34 @@ GLuint InitTexture(JPEGImage* image)
     
     return textureId;
 }
+
+
+void toggleFullscreen(GLFWwindow* window){
+    GLFWmonitor* monitor = glfwGetWindowMonitor(window);
+    if(monitor != NULL) {
+        // switch to windowed
+        glfwSetWindowMonitor(window, NULL, 80,80, 640,480, GLFW_DONT_CARE);
+    }else {
+        // switch to fullscreen
+        GLFWmonitor* primary = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(primary);
+        glfwSetWindowMonitor(window, primary, 0,0, mode->width, mode->height, mode->refreshRate);
+    }
+}
+
+void toggleFullscreenIfKeyIsPressed(GLFWwindow* window){
+    if(glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) {
+        f_pressed = false;
+    }
+    if(glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+        if(!f_pressed)
+        {
+            toggleFullscreen(window);
+        }
+        f_pressed = true;
+    }
+}
+
 
 int main(int argc, const char * argv[]) {
     std::string basedir;
@@ -90,8 +120,6 @@ int main(int argc, const char * argv[]) {
     const GLFWvidmode* mode = glfwGetVideoMode(primary);
 
     
-    int width = mode->width;
-    int height = mode->height;
     
     double elapsed = 0;
     double zoom = 0;
@@ -99,11 +127,6 @@ int main(int argc, const char * argv[]) {
     GLuint textureId;
     GLFWwindow* window;
 
-    float* correctedVertices = new float[8];
-    float height_f = (float)height;
-    float width_f = (float)width;
-    
-    
     // collect files for display
     log("looking for files...");
     imageFiles = new Files(basedir.c_str());
@@ -111,21 +134,31 @@ int main(int argc, const char * argv[]) {
     
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
+    //
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+
     // Create a window with OpenGL context
-    window = glfwCreateWindow(width, height, "OpenGL Window", glfwGetPrimaryMonitor(), NULL); // fullscreen
-    //window = glfwCreateWindow(width, height, "OpenGL Window", NULL, NULL);
+    window = glfwCreateWindow(mode->width, mode->height, "OpenGL Window", glfwGetPrimaryMonitor(), NULL); // fullscreen
+    
+    int width = 0;
+    int height = 0;
+
+    glfwGetWindowSize(window, &width, &height);
+    
+    float* correctedVertices = new float[8];
+    float height_f = (float)height;
+    float width_f = (float)width;
+    
+    
+    
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
 
-    // Set up an orthographic projection matrix to match the window size
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-width_f, width_f, -height_f, height_f, -1.0, 1.0);
-
-    // Switch back to the modelview matrix
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
+    
     
     JPEGImage* image = GetNextImage();
     JPEGImage* next_image = GetNextImage();
@@ -135,9 +168,29 @@ int main(int argc, const char * argv[]) {
     // initialize timer
     auto startTime = std::chrono::high_resolution_clock::now();
 
+
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
+            
+            
         
+        toggleFullscreenIfKeyIsPressed(window);
+    
+        glfwGetWindowSize(window, &width, &height);
+    
+        height_f = (float)height;
+        width_f = (float)width;
+        
+    
+        // Set up an orthographic projection matrix to match the window size
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(-width_f, width_f, -height_f, height_f, -1.0, 1.0);
+
+        // Switch back to the modelview matrix
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
         
         if(elapsed > timePerImage)
         {
@@ -167,7 +220,6 @@ int main(int argc, const char * argv[]) {
         correctedVertices[6] = -(height_f + zoom) * image->aspect; // top left x
         correctedVertices[7] = height_f + zoom; // top left y
         
-        
         // Enable texturing
         glEnable(GL_TEXTURE_2D);
         
@@ -176,16 +228,16 @@ int main(int argc, const char * argv[]) {
         glBegin(GL_TRIANGLES);
         {
             //bottom left part
-            glTexCoord2f(0, 1);
+            glTexCoord2f(0, 1.0f);
             glVertex2f(correctedVertices[0], correctedVertices[1]); // bottom left
-            glTexCoord2f(1.0f, 1);
+            glTexCoord2f(1.0f, 1.0f);
             glVertex2f(correctedVertices[2], correctedVertices[3]); // bottom right
             glTexCoord2f(1.0f, 0);
             glVertex2f(correctedVertices[4], correctedVertices[5]); // top right
         }
         {
             //top right part
-            glTexCoord2f(0, 1);
+            glTexCoord2f(0, 1.0f);
             glVertex2f(correctedVertices[0], correctedVertices[1]); // bottom left
             glTexCoord2f(1.0f, 0);
             glVertex2f(correctedVertices[4], correctedVertices[5]); // top right
@@ -202,6 +254,7 @@ int main(int argc, const char * argv[]) {
         glfwPollEvents();
         
         startTime = endTime;
+        
 
     }
 
