@@ -8,3 +8,7 @@
 ## how to build
 
 `make slide`
+
+## how to run
+
+`./slide <PATH_TO_YOUR_PICTURES>`
