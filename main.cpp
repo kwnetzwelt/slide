@@ -6,10 +6,12 @@
 //
 
 #include <iostream>
+#include <thread>
 #include <GLFW/glfw3.h>
 #include "JPEGImage.hpp"
 #include <GL/gl.h>
 #include "Files.hpp"
+
 
 
 static Files* imageFiles;
@@ -102,9 +104,8 @@ int main(int argc, const char * argv[]) {
     log("looking for files...");
     imageFiles = new Files(basedir.c_str());
     
-    log(std::to_string(imageFiles->count) + " files found");
     
-
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // Create a window with OpenGL context
     window = glfwCreateWindow(width, height, "OpenGL Window", glfwGetPrimaryMonitor(), NULL); // fullscreen
