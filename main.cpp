@@ -139,11 +139,14 @@ int main(int argc, const char * argv[]) {
     glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
     // Create a window with OpenGL context
     window = glfwCreateWindow(mode->width, mode->height, "OpenGL Window", glfwGetPrimaryMonitor(), NULL); // fullscreen
     
+    // hide mouse cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
     int width = 0;
     int height = 0;
 
