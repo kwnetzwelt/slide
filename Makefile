@@ -7,5 +7,13 @@ LDFLAGS=-L/usr/lib** -lstdc++fs -lglfw -lGL -ljpeg
 slide: $(SRCS)
 	$(CC) $(OPTIONS) $(CFLAGS) -o $@ $^ $(LDFLAGS) 
 
+OPTIONSOSX=-std=gnu++17
+CFLAGSOSX=-Wall -g -I/opt/homebrew/include -pthread
+LDFLAGSOSX=-L/opt/homebrew/lib -lglfw -framework OpenGL -ljpeg
+
+
+slide-mac: $(SRCS)
+	$(CC) $(OPTIONSOSX) $(CFLAGSOSX) -o $@ $^ $(LDFLAGSOSX) 
+
 clean:
 	rm -f slide

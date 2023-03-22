@@ -9,7 +9,11 @@
 #include <thread>
 #include <GLFW/glfw3.h>
 #include "JPEGImage.hpp"
+#ifdef __MAC_10_0
+#include <OpenGL/gl.h>
+#elif
 #include <GL/gl.h>
+#endif
 #include "Files.hpp"
 
 
