@@ -11,7 +11,7 @@
 #include "JPEGImage.hpp"
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
-#elif
+#else
 #include <GL/gl.h>
 #endif
 #include "Files.hpp"
@@ -174,6 +174,7 @@ int main(int argc, const char * argv[]) {
     // initialize timer
     auto startTime = std::chrono::high_resolution_clock::now();
 
+    toggleFullscreen(window);
 
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
