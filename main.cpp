@@ -9,7 +9,7 @@
 #include <thread>
 #include <GLFW/glfw3.h>
 #include "JPEGImage.hpp"
-#ifdef __MAC_10_0
+#ifdef __APPLE__
 #include <OpenGL/gl.h>
 #elif
 #include <GL/gl.h>
@@ -20,10 +20,16 @@
 static bool f_pressed;
 static Files* imageFiles;
 
+void log(std::string text)
+{
+    std::cout << text << std::endl;
+}
+
 JPEGImage* GetNextImage()
 {
     std::string fileName;
     fileName = imageFiles->GetNextRandom();
+    log(fileName);
     return new JPEGImage(fileName.c_str());
 }
 
@@ -35,10 +41,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
-void log(std::string text)
-{
-    std::cout << text << std::endl;
-}
 
 void PrintHelp()
 {
@@ -51,20 +53,16 @@ void PrintHelp()
 double lerp(double start, double end, double fraction) {
     return start + fraction * (end - start);
 }
-GLuint InitTexture(JPEGImage* image)
+GLuint InitTexture(JPEGImage* image, GLuint textureId)
 {
     // Load image data into a texture
-    GLuint textureId;
-    
-    glGenTextures(1, &textureId);
+    //GLuint textureId;
     glBindTexture(GL_TEXTURE_2D, textureId);
-    
     // Set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->data);
     
     return textureId;
@@ -101,7 +99,7 @@ void toggleFullscreenIfKeyIsPressed(GLFWwindow* window){
 int main(int argc, const char * argv[]) {
     std::string basedir;
     //std::string basedir;
-    int timePerImage = 15;
+    double timePerImage = 6;
 
     // parse commandline arguments
     if(argc > 1)
@@ -170,7 +168,8 @@ int main(int argc, const char * argv[]) {
     JPEGImage* image = GetNextImage();
     JPEGImage* next_image = GetNextImage();
     
-    textureId = InitTexture(image);
+    glGenTextures(1, &textureId);
+    InitTexture(image, textureId);
     
     // initialize timer
     auto startTime = std::chrono::high_resolution_clock::now();
@@ -202,13 +201,12 @@ int main(int argc, const char * argv[]) {
         if(elapsed > timePerImage)
         {
             delete image;
-            image = next_image;
-            next_image = GetNextImage();
+            image = GetNextImage();
             elapsed = 0;
             
             glDeleteTextures(1, &textureId);
-            textureId = InitTexture(image);
-            
+            InitTexture(image, textureId);
+        
         }
         auto endTime = std::chrono::high_resolution_clock::now();
         auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
@@ -231,7 +229,6 @@ int main(int argc, const char * argv[]) {
         glEnable(GL_TEXTURE_2D);
         
         glClear(GL_COLOR_BUFFER_BIT);
-        glBindTexture(GL_TEXTURE_2D, textureId);
         glBegin(GL_TRIANGLES);
         {
             //bottom left part

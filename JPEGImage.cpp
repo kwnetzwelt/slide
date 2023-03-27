@@ -38,7 +38,7 @@ JPEGImage::JPEGImage(const char* filename) {
     jpeg_start_decompress(&cinfo);
 
     width = cinfo.output_width;
-    height = cinfo.output_height;
+    height = std::fmax(1,cinfo.output_height);
     aspect = width/(double)height;
     unsigned int numChannels = cinfo.num_components;
     data = new unsigned char[width * height * numChannels];
