@@ -89,8 +89,8 @@ void JPEGImage::draw(double deltaTime, int screen_width, int screen_height) {
     double window_aspect = screen_width/(double)screen_height;
     
     elapsedTime += deltaTime;
-    const double speed = 0.01;
-    double frac = elapsedTime * speed;
+    //const double speed = 0.01;
+    //double frac = elapsedTime * speed;
     
     double scale_x = 0;
     double scale_y = 0;
