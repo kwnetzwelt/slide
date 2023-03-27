@@ -173,8 +173,6 @@ int main(int argc, const char * argv[]) {
     // initialize timer
     auto startTime = std::chrono::high_resolution_clock::now();
 
-    toggleFullscreen(window);
-
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
             
