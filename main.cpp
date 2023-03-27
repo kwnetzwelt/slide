@@ -166,7 +166,6 @@ int main(int argc, const char * argv[]) {
     
     
     JPEGImage* image = GetNextImage();
-    JPEGImage* next_image = GetNextImage();
     
     glGenTextures(1, &textureId);
     InitTexture(image, textureId);
