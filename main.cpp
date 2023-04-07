@@ -29,8 +29,9 @@ JPEGImage* GetNextImage()
 {
     std::string fileName;
     fileName = imageFiles->GetNextRandom();
-    log(fileName);
-    return new JPEGImage(fileName.c_str());
+    log(fileName.c_str());
+    auto image = new JPEGImage(fileName);
+    return image;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -45,7 +46,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void PrintHelp()
 {
     log("pass a directory as a first argument");
-    log("pass an integer time in seconds as a second argument (default is 5)");
+    log("pass an integer time in seconds as a second argument (default is 6)");
+    log("pass 'w' as a third argument if you want to start windowed instead of fullscreen");
     log("you can press <f> to toggle fullscreen");
     log("you can press <q> to quit");
 }
@@ -100,6 +102,7 @@ int main(int argc, const char * argv[]) {
     std::string basedir;
     //std::string basedir;
     double timePerImage = 6;
+    bool startWindowed = false;
 
     // parse commandline arguments
     if(argc > 1)
@@ -112,7 +115,10 @@ int main(int argc, const char * argv[]) {
     {
         timePerImage = std::atoi(argv[2]);
     }
-    
+    if(argc > 3)
+    {
+        startWindowed = std::string(argv[3]) == "w";
+    }
     
     // Initialize GLFW library
     glfwInit();
@@ -163,10 +169,12 @@ int main(int argc, const char * argv[]) {
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
 
+    if(startWindowed) toggleFullscreen(window);
     
     
     JPEGImage* image = GetNextImage();
-    
+    image->wait();
+    JPEGImage* nextImage = GetNextImage();
     glGenTextures(1, &textureId);
     InitTexture(image, textureId);
     
@@ -196,12 +204,13 @@ int main(int argc, const char * argv[]) {
         glLoadIdentity();
 
         
-        if(elapsed > timePerImage)
+        if(elapsed > timePerImage && nextImage->isReady())
         {
             delete image;
-            image = GetNextImage();
+            image = nextImage;
+            nextImage = GetNextImage();
             elapsed = 0;
-            
+            glfwFocusWindow(window);
             glDeleteTextures(1, &textureId);
             InitTexture(image, textureId);
         

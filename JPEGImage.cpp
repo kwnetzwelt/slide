@@ -9,6 +9,8 @@
 #include <jpeglib.h>
 #include <cmath>
 #include <iostream>
+#include <chrono>
+
 /*extern "C" {
     #include <jpeglib.h>
 }*/
@@ -19,7 +21,34 @@
 #endif
 #include <stdio.h>
 
-JPEGImage::JPEGImage(const char* filename) {
+JPEGImage::JPEGImage(std::string filename) {
+    
+    done = false;
+    this->filename = filename;
+    initThread = new std::thread([this] {
+        init(this->filename.c_str());
+        done = true;
+    });
+
+}
+
+bool JPEGImage::isReady() {
+    // Get thread status using wait_for as before.
+    if(done && initThread->joinable())
+    {
+        initThread->join();
+    }
+    return done;
+}
+
+void JPEGImage::wait() {
+    while(!isReady())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+void JPEGImage::init(const char* filename){ //, int* width, int* height, double* aspect, unsigned char* data) {
     elapsedTime = 0;
     FILE* infile = fopen(filename, "rb");
 
@@ -37,6 +66,11 @@ JPEGImage::JPEGImage(const char* filename) {
     jpeg_read_header(&cinfo, TRUE);
     jpeg_start_decompress(&cinfo);
 
+    std::cout << "jpeg color space: " << cinfo.jpeg_color_space << "\n";
+    std::cout << "out color space: " << cinfo.out_color_space << "\n";
+    std::cout << "dct method: " << cinfo.dct_method << "\n";
+    
+
     width = cinfo.output_width;
     height = std::fmax(1,cinfo.output_height);
     aspect = width/(double)height;
@@ -49,25 +83,7 @@ JPEGImage::JPEGImage(const char* filename) {
         rowptr = data + cinfo.output_scanline * width * numChannels;
         jpeg_read_scanlines( &cinfo, &rowptr, 1 );
     }
-/*
-    JSAMPARRAY buffer = new JSAMPROW[cinfo.output_height];
-    for (int i = 0; i < cinfo.output_height; i++)
-        buffer[i] = new JSAMPLE[cinfo.output_width * cinfo.output_components];
 
-    while (cinfo.output_scanline < cinfo.output_height) {
-        int row = cinfo.output_scanline;
-        jpeg_read_scanlines(&cinfo, buffer + row, 1);
-        for (int col = 0; col < cinfo.output_width; col++) {
-            data[(row * width + col) * 3 + 0] = buffer[row][col * cinfo.output_components + 0];
-            data[(row * width + col) * 3 + 1] = buffer[row][col * cinfo.output_components + 0];
-            data[(row * width + col) * 3 + 2] = buffer[row][col * cinfo.output_components + 0];
-        }
-    }
-
-    for (int i = 0; i < cinfo.output_height; i++)
-        delete[] buffer[i];
-    delete[] buffer;
-*/
     jpeg_finish_decompress(&cinfo);
     jpeg_destroy_decompress(&cinfo);
 
@@ -76,6 +92,7 @@ JPEGImage::JPEGImage(const char* filename) {
 
 JPEGImage::~JPEGImage() {
     delete[] data;
+    delete initThread;
 }
 
 void JPEGImage::draw() {

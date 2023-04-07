@@ -9,7 +9,7 @@ slide: $(SRCS)
 
 OPTIONSOSX=-std=gnu++17
 CFLAGSOSX=-Wno-deprecated-declarations -Wall -g -I/opt/homebrew/include -pthread
-LDFLAGSOSX=-L/opt/homebrew/lib -lglfw -framework OpenGL -ljpeg
+LDFLAGSOSX=-L/opt/homebrew/lib -lglfw -framework OpenGL -lturbojpeg
 
 
 slide-mac: $(SRCS)
